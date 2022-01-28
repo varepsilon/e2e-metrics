@@ -231,8 +231,8 @@ def evaluate(data_src, data_ref, data_sys,
     """Main procedure, running the MS-COCO & MTEval evaluators on the loaded data."""
 
     # run the MS-COCO evaluator
-    coco_eval = run_coco_eval(data_ref, data_sys)
-    scores = {metric: score for metric, score in list(coco_eval.eval.items())}
+    # coco_eval = run_coco_eval(data_ref, data_sys)
+    scores = {} # metric: score for metric, score in list(coco_eval.eval.items())}
 
     # run MT-Eval (original or Python)
     if python:
@@ -242,7 +242,7 @@ def evaluate(data_src, data_ref, data_sys,
     scores.update(mteval_scores)
 
     # print out the results
-    metric_names = ['BLEU', 'NIST', 'METEOR', 'ROUGE_L', 'CIDEr']
+    metric_names = ['BLEU', 'NIST'] #, 'METEOR', 'ROUGE_L', 'CIDEr']
     if print_as_table:
         if print_table_header:
             print('\t'.join(['File'] + metric_names))
