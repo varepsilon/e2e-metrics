@@ -200,7 +200,7 @@ def create_mteval_file(refs, path, file_type):
         fh.write('</%s>' % settype)
 
 
-def load_data(ref_file, sys_file, src_file=None):
+def load_data(ref_file, sys_file, sys_file2, src_file=None):
     """Load the data from the given files."""
     # read SRC/SYS files
     if src_file:
@@ -209,6 +209,7 @@ def load_data(ref_file, sys_file, src_file=None):
         data_src, data_sys = read_tsv(sys_file, HEADER_SRC, HEADER_SYS)
     else:
         data_sys = read_lines(sys_file)
+        data_sys2 = read_lines(sys_file2)
         # dummy source files (sources have no effect on measures, but MTEval wants them)
         data_src = [''] * len(data_sys)
 
@@ -222,7 +223,9 @@ def load_data(ref_file, sys_file, src_file=None):
 
     # sanity check
     assert(len(data_ref) == len(data_sys) == len(data_src))
-    return data_src, data_ref, data_sys
+    assert(len(data_sys) == len(data_sys2))
+    # TODO(varepsilon): do significance testing instead of simply concatenating.
+    return data_src + data_src, data_ref + data_ref, data_sys + data_sys2
 
 
 def evaluate(data_src, data_ref, data_sys,
@@ -371,9 +374,11 @@ if __name__ == '__main__':
                     'SRC columns are grouped as multiple references for the same source.')
     ap.add_argument('sys_file', type=str, help='System output file to evaluate (text file with ' +
                     'one output per line, or a TSV file with sources & corresponding outputs).')
+    ap.add_argument('sys_file2', type=str, help='System output file to evaluate (text file with ' +
+                    'one output per line, or a TSV file with sources & corresponding outputs).')
     args = ap.parse_args()
 
-    data_src, data_ref, data_sys = load_data(args.ref_file, args.sys_file, args.src_file)
+    data_src, data_ref, data_sys = load_data(args.ref_file, args.sys_file, args.sys_file2, args.src_file)
     if args.sent_level is not None:
         sent_level_scores(data_src, data_ref, data_sys, args.sent_level)
     else:
